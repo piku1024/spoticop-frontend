@@ -7,7 +7,7 @@ import PlaylistSongs from "./components/PlaylistSongs";
 
 const App = () => {
     return (
-        <Router>
+        <Router basename="/spoticop-frontend">
             <Routes>
                 <Route path="/user" element={<UserDetailsWrapper />} />
                 <Route path="/user/albums" element={<UserSavedAlbumsWrapper />} />
