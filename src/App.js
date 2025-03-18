@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import UserDetails from "./components/UserDetails";
 import UserSavedAlbums from "./components/UserSavedAlbums";
 import UserPlaylists from "./components/UserPlaylists";
