@@ -3,26 +3,20 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 const PlaylistSongs = () => {
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const playlistId = queryParams.get("playlistId"); // Extract playlistId
-    const userId = queryParams.get("userId"); // Extract userId
-
     const [songs, setSongs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const queryParams = new URLSearchParams(useLocation().search);
+    const playlistId = queryParams.get("playlistId");
+    const userId = queryParams.get("userId");
 
     useEffect(() => {
         if (!playlistId || !userId) {
-            setError("Playlist ID or User ID is missing!");
-            setLoading(false);
+            console.error("Playlist ID or User ID is missing!");
             return;
         }
 
         axios.get(`http://localhost:8080/api/playlist-songs?playlistId=${playlistId}&userId=${userId}`)
-            .then(response => {
-                console.log("API Response:", response.data); // Debugging
-
+            .then((response) => {
+                console.log("API Response:", response.data);
                 if (response.data && Array.isArray(response.data)) {
                     setSongs(response.data);
                 } else {
@@ -30,35 +24,29 @@ const PlaylistSongs = () => {
                     console.error("Unexpected response format:", response.data);
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error("Error fetching songs:", error);
-                setError("Failed to fetch songs.");
                 setSongs([]);
-            })
-            .finally(() => {
-                setLoading(false);
             });
-
     }, [playlistId, userId]);
 
     return (
         <div>
             <h2>Playlist Songs</h2>
-
-            {loading ? (
-                <p>Loading songs...</p>
-            ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
-            ) : songs.length > 0 ? (
-                <ul>
-                    {songs.map((song) => (
-                        <li key={song.track.id}>
-                            <strong>{song.track.name}</strong> - {song.track.artists.map(artist => artist.name).join(", ")}
-                        </li>
-                    ))}
-                </ul>
+            {playlistId && userId ? (
+                songs.length > 0 ? (
+                    <ul>
+                        {songs.map((song) => (
+                            <li key={song.track.id}>
+                                <strong>{song.track.name}</strong> - {song.track.artists.map(artist => artist.name).join(", ")}
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No songs found.</p>
+                )
             ) : (
-                <p>No songs found.</p>
+                <p style={{ color: "red" }}>Playlist ID or User ID is missing!</p>
             )}
         </div>
     );

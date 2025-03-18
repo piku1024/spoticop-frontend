@@ -5,15 +5,34 @@ import UserSavedAlbums from "./components/UserSavedAlbums";
 import UserPlaylists from "./components/UserPlaylists";
 import PlaylistSongs from "./components/PlaylistSongs";
 
+const UserNavigation = () => {
+    const userId = new URLSearchParams(useLocation().search).get("userId");
+
+    return (
+        <nav>
+            {userId ? (
+                <Link to={`/user/playlists?userId=${userId}`}>Go to Playlists</Link>
+            ) : (
+                <p style={{ color: "red" }}>User ID is missing!</p>
+            )}
+        </nav>
+    );
+};
+
+const basePath = "/spoticop-frontend";
+
 const App = () => {
     return (
-        <Router basename="/spoticop-frontend">
-            <Routes>
-                <Route path="/user" element={<UserDetailsWrapper />} />
-                <Route path="/user/albums" element={<UserSavedAlbumsWrapper />} />
-                <Route path="/user/playlists" element={<UserPlaylistsWrapper />} />
-                <Route path="/playlist/:playlistId" element={<PlaylistSongs />} />
-            </Routes>
+        <Router basename={basePath}>
+            <div>
+                <UserNavigation />
+                <Routes>
+                    <Route path="/user" element={<UserDetailsWrapper />} />
+                    <Route path="/user/albums" element={<UserSavedAlbumsWrapper />} />
+                    <Route path="/user/playlists" element={<UserPlaylistsWrapper />} />
+                    <Route path="/playlist/:playlistId" element={<PlaylistSongs />} />
+                </Routes>
+            </div>
         </Router>
     );
 };

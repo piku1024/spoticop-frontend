@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
 
 const UserPlaylists = () => {
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const userId = queryParams.get("userId"); // Extract userId from URL
-
     const [playlists, setPlaylists] = useState([]);
+    const userId = new URLSearchParams(useLocation().search).get("userId");
 
     useEffect(() => {
         if (!userId) {
@@ -16,11 +13,18 @@ const UserPlaylists = () => {
         }
 
         axios.get(`http://localhost:8080/api/user-playlists?userId=${userId}`)
-            .then(response => {
-                setPlaylists(response.data);
+            .then((response) => {
+                console.log("Fetched playlists:", response.data);
+                if (response.data && Array.isArray(response.data)) {
+                    setPlaylists(response.data);
+                } else {
+                    setPlaylists([]);
+                    console.error("Unexpected response format:", response.data);
+                }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error("Error fetching playlists:", error);
+                setPlaylists([]);
             });
     }, [userId]);
 
@@ -31,7 +35,11 @@ const UserPlaylists = () => {
                 playlists.length > 0 ? (
                     <ul>
                         {playlists.map((playlist) => (
-                            <li key={playlist.id}>{playlist.name}</li>
+                            <li key={playlist.id}>
+                                <Link to={`/playlist/songs?playlistId=${playlist.id}&userId=${userId}`}>
+                                    {playlist.name}
+                                </Link>
+                            </li>
                         ))}
                     </ul>
                 ) : (
