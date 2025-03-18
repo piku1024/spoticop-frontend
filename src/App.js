@@ -1,12 +1,15 @@
 import React from "react";
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
+import { HashRouter as Router, Route, Routes, useLocation, Link } from "react-router-dom";
 import UserDetails from "./components/UserDetails";
 import UserSavedAlbums from "./components/UserSavedAlbums";
 import UserPlaylists from "./components/UserPlaylists";
 import PlaylistSongs from "./components/PlaylistSongs";
 
+const basePath = "/spoticop-frontend";
+
 const UserNavigation = () => {
-    const userId = new URLSearchParams(useLocation().search).get("userId");
+    const location = useLocation();
+    const userId = new URLSearchParams(location.search).get("userId");
 
     return (
         <nav>
@@ -19,8 +22,6 @@ const UserNavigation = () => {
     );
 };
 
-const basePath = "/spoticop-frontend";
-
 const App = () => {
     return (
         <Router basename={basePath}>
@@ -30,33 +31,39 @@ const App = () => {
                     <Route path="/user" element={<UserDetailsWrapper />} />
                     <Route path="/user/albums" element={<UserSavedAlbumsWrapper />} />
                     <Route path="/user/playlists" element={<UserPlaylistsWrapper />} />
-                    <Route path="/playlist/:playlistId" element={<PlaylistSongs />} />
+                    <Route path="/playlist/songs" element={<PlaylistSongsWrapper />} />
                 </Routes>
             </div>
         </Router>
     );
 };
 
-// Helper wrappers to extract userId from URL params
+// 🔹 Helper wrappers to extract userId and playlistId from URL params
 const UserDetailsWrapper = () => {
     const userId = new URLSearchParams(window.location.search).get("userId");
-    return <UserDetails userId={userId} />;
+    return userId ? <UserDetails userId={userId} /> : <p style={{ color: "red" }}>User ID is missing!</p>;
 };
 
 const UserSavedAlbumsWrapper = () => {
     const userId = new URLSearchParams(window.location.search).get("userId");
-    return <UserSavedAlbums userId={userId} />;
+    return userId ? <UserSavedAlbums userId={userId} /> : <p style={{ color: "red" }}>User ID is missing!</p>;
 };
 
 const UserPlaylistsWrapper = () => {
     const userId = new URLSearchParams(window.location.search).get("userId");
-    return <UserPlaylists userId={userId} />;
+    return userId ? <UserPlaylists userId={userId} /> : <p style={{ color: "red" }}>User ID is missing!</p>;
 };
 
 const PlaylistSongsWrapper = () => {
-    const userId = new URLSearchParams(window.location.search).get("userId");
-    const playlistId = new URLSearchParams(window.location.search).get("playlistId");
-    return <PlaylistSongs userId={userId} playlistId={playlistId} />;
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get("userId");
+    const playlistId = params.get("playlistId");
+
+    return userId && playlistId ? (
+        <PlaylistSongs userId={userId} playlistId={playlistId} />
+    ) : (
+        <p style={{ color: "red" }}>User ID or Playlist ID is missing!</p>
+    );
 };
 
 export default App;
