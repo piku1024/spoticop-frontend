@@ -5,16 +5,19 @@ import UserSavedAlbums from "./components/UserSavedAlbums";
 import UserPlaylists from "./components/UserPlaylists";
 import PlaylistSongs from "./components/PlaylistSongs";
 
-const basePath = "/spoticop-frontend";
+// 🔹 Extract userId dynamically from URL
+const useUserId = () => {
+    const location = useLocation();
+    return new URLSearchParams(location.search).get("userId");
+};
 
 const UserNavigation = () => {
-    const location = useLocation();
-    const userId = new URLSearchParams(location.search).get("userId");
+    const userId = useUserId();
 
     return (
         <nav>
             {userId ? (
-                <Link to={`/user/playlists?userId=${userId}`}>Go to Playlists</Link>
+                <Link to={{ pathname: "/user/playlists", search: `?userId=${userId}` }}>Go to Playlists</Link>
             ) : (
                 <p style={{ color: "red" }}>User ID is missing!</p>
             )}
@@ -24,7 +27,7 @@ const UserNavigation = () => {
 
 const App = () => {
     return (
-        <Router basename={basePath}>
+        <Router>
             <div>
                 <UserNavigation />
                 <Routes>
@@ -38,24 +41,25 @@ const App = () => {
     );
 };
 
-// 🔹 Helper wrappers to extract userId and playlistId from URL params
+// 🔹 Helper wrappers to extract `userId` and `playlistId`
 const UserDetailsWrapper = () => {
-    const userId = new URLSearchParams(window.location.search).get("userId");
+    const userId = useUserId();
     return userId ? <UserDetails userId={userId} /> : <p style={{ color: "red" }}>User ID is missing!</p>;
 };
 
 const UserSavedAlbumsWrapper = () => {
-    const userId = new URLSearchParams(window.location.search).get("userId");
+    const userId = useUserId();
     return userId ? <UserSavedAlbums userId={userId} /> : <p style={{ color: "red" }}>User ID is missing!</p>;
 };
 
 const UserPlaylistsWrapper = () => {
-    const userId = new URLSearchParams(window.location.search).get("userId");
+    const userId = useUserId();
     return userId ? <UserPlaylists userId={userId} /> : <p style={{ color: "red" }}>User ID is missing!</p>;
 };
 
 const PlaylistSongsWrapper = () => {
-    const params = new URLSearchParams(window.location.search);
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
     const userId = params.get("userId");
     const playlistId = params.get("playlistId");
 
